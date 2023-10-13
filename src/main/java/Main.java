@@ -26,9 +26,9 @@ public class Main {
         while (flag) {
 
             System.out.println("Выберите действие:");
-            System.out.println("1 - зарегистрироваться");
-            System.out.println("2 - авторизоваться");
-            System.out.println("3 - выход");
+            System.out.println("1-зарегистрироваться");
+            System.out.println("2-авторизоваться");
+            System.out.println("3-выход");
             selectionNumber = scanner.nextInt();
             if (selectionNumber == 1) {
                 System.out.println("Введите логин:");
