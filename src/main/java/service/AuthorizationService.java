@@ -55,10 +55,10 @@ public class AuthorizationService {
                 throw new IllegalArgumentException("Игрок с таким именем пользователя уже существует. Пожалуйста, используйте другое имя пользователя.");
             }
             AuthorizationRepository.insertRecord(login,password);
+            player = AuthorizationRepository.retrievePlayer(login);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
 
 
         loggerService.info(Action.REGISTRATION);
