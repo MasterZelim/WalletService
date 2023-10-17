@@ -31,6 +31,37 @@ public class AuthorizationRepository {
         }
 
     }
+    public static Player retrievePlayer(int id) throws SQLException {
+
+        List<Player> playerList = new ArrayList<>();
+
+        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+
+            String retrieveDataSQL = "SELECT * FROM players";
+            Statement retrieveDataStatement = connection.createStatement();
+            ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
+
+            while (resultSet.next()){
+                int player_id = resultSet.getInt("id");
+                String loginPlayer = resultSet.getString("login");
+                String password = resultSet.getString("password");
+
+                Player player = new Player(player_id,loginPlayer,password);
+                playerList.add(player);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (Player player : playerList) {
+
+            if (player.getId()==(id)){
+                return player;
+            }
+        }
+        return null;
+    }
     public static Player retrievePlayer(String login) throws SQLException {
 
         List<Player> playerList = new ArrayList<>();
@@ -42,13 +73,13 @@ public class AuthorizationRepository {
             ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
 
             while (resultSet.next()){
+                int player_id = resultSet.getInt("id");
                 String loginPlayer = resultSet.getString("login");
                 String password = resultSet.getString("password");
 
-                Player player = new Player(loginPlayer,password);
+                Player player = new Player(player_id,loginPlayer,password);
                 playerList.add(player);
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,7 +90,6 @@ public class AuthorizationRepository {
             if (player.getLogin().equals(login)){
                 return player;
             }
-
         }
         return null;
     }

@@ -5,23 +5,16 @@ import model.Transaction;
 import service.*;
 import validation.PlayerValidator;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
+
 import static model.TransactionType.CREDIT;
 import static model.TransactionType.DEBIT;
 
+
 public class Main {
 
-
-
-    public static void main(String[] args) {
-
-
-
+    public static void main(String[] args) throws SQLException {
 
         AuditService auditService = new AuditService();
         TransactionService transactionService = new TransactionService(auditService);
@@ -72,18 +65,18 @@ public class Main {
                     System.out.println("6. Выход");
                     selectionNumber = scanner.nextInt();
 
-//                    if (selectionNumber == 1) {
-//                        System.out.println("Введите сумму");
-//                        double amount = scanner.nextDouble();
-//                        Transaction credit = new Transaction(amount, accountService.getAccount(player), CREDIT);
-//                        transactionService.processTransaction(credit);
-//                    }
-//                    if (selectionNumber == 2) {
-//                        System.out.println("Введите сумму");
-//                        double amount = scanner.nextDouble();
-//                        Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
-//                        transactionService.processTransaction(debit);
-//                    }
+                    if (selectionNumber == 1) {
+                        System.out.println("Введите сумму");
+                        double amount = scanner.nextDouble();
+                        Transaction credit = new Transaction(amount, accountService.getAccount(player), CREDIT);
+                        transactionService.processTransaction(credit);
+                    }
+                    if (selectionNumber == 2) {
+                        System.out.println("Введите сумму");
+                        double amount = scanner.nextDouble();
+                        Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
+                        transactionService.processTransaction(debit);
+                    }
 //                    if (selectionNumber == 3) {
 //                        accountService.showPlayerCurrentBalance(player.getLogin());
 //                    }
