@@ -20,15 +20,13 @@ public class AuthorizationService {
         this.playerValidator = PlayerValidator;
 
     }
-    public Player logIn(String login, String password)  {
+    public Player logIn(String login, String password) throws SQLException {
         playerValidator.validationPlayerName(login);
         playerValidator.validationPlayerPassword(password);
         Player player = null;
-        try {
+
             player = AuthorizationRepository.retrievePlayer(login);
-        }catch (SQLException e){
-            throw new RuntimeException();
-        }
+
 
         if (player == null) {
             throw new IllegalArgumentException("Игрок с таким логином не найден " + login);

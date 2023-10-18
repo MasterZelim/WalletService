@@ -37,4 +37,16 @@ public class Player {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) { // проверка на идентичность
+            return true;
+        }
+        if (!(obj instanceof Player)) { // проверка типа объекта
+            return false;
+        }
+        Player other = (Player) obj; // приведение объекта к типу Player
+        return this.id ==(other.id) && this.login.equals(other.login)&&this.password.equals(other.password); // сравнение содержимого
+    }
 }
