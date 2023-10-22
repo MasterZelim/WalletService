@@ -1,6 +1,5 @@
 package model;
 
-import lombok.Data;
 import java.util.UUID;
 
 public class Transaction {
@@ -9,12 +8,6 @@ public class Transaction {
     private double amount;
     private Account account;
     private TransactionType transactionType;
-    public Transaction(double amount, Account account, TransactionType transactionType) {
-        this.uuid = UUID.randomUUID();
-        this.amount = amount;
-        this.account = account;
-        this.transactionType = transactionType;
-    }
 
 
     public Transaction(long id, UUID uuid, double amount, Account account, TransactionType transactionType) {
@@ -24,6 +17,15 @@ public class Transaction {
         this.account = account;
         this.transactionType = transactionType;
     }
+
+    public Transaction(double amount, Account account, TransactionType transactionType) {
+        this.uuid = UUID.randomUUID();
+        this.amount = amount;
+        this.account = account;
+        this.transactionType = transactionType;
+    }
+
+
 
     public UUID getUuid() {
         return uuid;
@@ -57,3 +59,4 @@ public class Transaction {
         this.transactionType = transactionType;
     }
 }
+
