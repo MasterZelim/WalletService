@@ -3,11 +3,10 @@ package service;
 import model.Account;
 import model.Action;
 import model.Player;
-import repozitory.AccountRepository;
+import repository.AccountRepository;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+
 public class AccountService {
 
     private final LoggerService loggerService;
@@ -20,7 +19,7 @@ public class AccountService {
         Account account = null;
         try {
             AccountRepository.createTable();
-            account = AccountRepository.retrieveAccount(player);
+            account = AccountRepository.getAccountByPlayerId(player);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

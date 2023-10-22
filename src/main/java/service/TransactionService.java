@@ -1,7 +1,7 @@
 package service;
 
 import model.*;
-import repozitory.TransactionRepository;
+import repository.TransactionRepository;
 import validation.AccountValidator;
 
 import java.sql.SQLException;

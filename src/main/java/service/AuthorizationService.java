@@ -2,12 +2,11 @@ package service;
 
 import model.Action;
 import model.Player;
-import repozitory.AuthorizationRepository;
+import repository.AuthorizationRepository;
 import validation.PlayerValidator;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+
 public class AuthorizationService {
 
 

@@ -1,5 +1,6 @@
-package repozitory;
+package repository;
 
+import connection.ConnectionDatabase;
 import model.Account;
 import model.Player;
 import java.sql.*;
@@ -7,29 +8,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountRepository {
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
-    private static final String USER_NAME = "postgres";
-    private static final String PASSWORD = "1";
+
 
     public static void insertRecord(Account account) throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
 
-            String insertDataSQL = "INSERT INTO accounts (player_id, balance) VALUES (?, ?)";
-            PreparedStatement insertDataStatement = connection.prepareStatement(insertDataSQL);
-            insertDataStatement.setLong(1, account.getPlayer().getId());
-            insertDataStatement.setDouble(2, account.getBalance());
-            insertDataStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            try(Connection connection = ConnectionDatabase.connection()) {
+                String insertDataSQL = "INSERT INTO accounts (player_id, balance) VALUES (?, ?)";
+                PreparedStatement insertDataStatement = connection.prepareStatement(insertDataSQL);
+                insertDataStatement.setLong(1, account.getPlayer().getId());
+                insertDataStatement.setDouble(2, account.getBalance());
+                insertDataStatement.executeUpdate();
 
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
     }
-    public static Account retrieveAccount(Player player) throws SQLException {
+    public static Account getAccountByPlayerId(Player player) throws SQLException {
 
         List<Account> accountList = new ArrayList<>();
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+        try (Connection connection = ConnectionDatabase.connection()) {
 
             String retrieveDataSQL = "SELECT * FROM accounts";
             Statement retrieveDataStatement = connection.createStatement();
@@ -39,7 +38,6 @@ public class AccountRepository {
                 long id = resultSet.getInt("id");
                 int player_id = resultSet.getInt("player_id");
                 double balance = resultSet.getDouble("balance");
-
                 Player player1 = AuthorizationRepository.retrievePlayer(player_id);
                 Account account = new Account(id,player1,balance);
                 accountList.add(account);
@@ -57,11 +55,11 @@ public class AccountRepository {
         }
         return null;
     }
-    public static Account retrieveAccount(long id) throws SQLException {
+    public static Account getAccountById(long id) throws SQLException {
 
         List<Account> accountList = new ArrayList<>();
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+        try (Connection connection = ConnectionDatabase.connection()) {
 
             String retrieveDataSQL = "SELECT * FROM accounts";
             Statement retrieveDataStatement = connection.createStatement();
@@ -91,7 +89,7 @@ public class AccountRepository {
     }
     public static void createTable() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+        try (Connection connection = ConnectionDatabase.connection()) {
 
             String createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (" +
                     "id SERIAL PRIMARY KEY," +

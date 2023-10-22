@@ -1,5 +1,3 @@
-package connection;
-
 import model.Player;
 import model.Transaction;
 import service.*;

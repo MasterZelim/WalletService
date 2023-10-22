@@ -1,9 +1,7 @@
-package repozitory;
+package repository;
 
 
 
-import model.Account;
-import model.Action;
 import model.Player;
 
 import java.sql.*;

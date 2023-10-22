@@ -1,7 +1,6 @@
-package repozitory;
+package repository;
 
 import model.Account;
-import model.Player;
 import model.Transaction;
 import model.TransactionType;
 
@@ -49,7 +48,7 @@ public class TransactionRepository {
                 long account_id = resultSet.getLong("account_id");
                 TransactionType transactionType = TransactionType.valueOf(resultSet.getString("transactionType"));
 
-                Account account1 = AccountRepository.retrieveAccount(account_id);
+                Account account1 = AccountRepository.getAccountById(account_id);
                 Transaction transaction = new Transaction(id,uuid,amount,account1,transactionType);
 
                 if (transaction.getAccount().equals(account)){
@@ -76,15 +75,15 @@ public class TransactionRepository {
             ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
 
             while (resultSet.next()){
-                long id = resultSet.getInt("id");
+                long id = resultSet.getLong("id");
                 UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                 double amount = resultSet.getDouble("amount");
                 long account_id = resultSet.getLong("account_id");
                 TransactionType transactionType = TransactionType.valueOf(resultSet.getString("transactionType"));
 
-                Account account1 = AccountRepository.retrieveAccount(account_id);
+                Account account1 = AccountRepository.getAccountById(account_id);
                 Transaction transaction1 = new Transaction(id,uuid,amount,account1,transactionType);
-                transactionList.add(transaction);
+                transactionList.add(transaction1);
             }
 
         } catch (SQLException e) {
