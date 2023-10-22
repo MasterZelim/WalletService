@@ -1,13 +1,20 @@
+package connection;
+
 import model.Player;
 import model.Transaction;
 import service.*;
 import validation.PlayerValidator;
+
+import java.sql.SQLException;
 import java.util.Scanner;
+
 import static model.TransactionType.CREDIT;
 import static model.TransactionType.DEBIT;
 
+
 public class Main {
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws SQLException {
 
         AuditService auditService = new AuditService();
         TransactionService transactionService = new TransactionService(auditService);
@@ -70,15 +77,15 @@ public class Main {
                         Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
                         transactionService.processTransaction(debit);
                     }
-                    if (selectionNumber == 3) {
-                        accountService.showPlayerCurrentBalance(player.getLogin());
-                    }
-                    if (selectionNumber == 4) {
-                        auditService.printAuditUserHistory(player.getLogin());
-                    }
-                    if (selectionNumber == 5) {
-                        transactionService.showUserOperationHistory(player.getLogin());
-                    }
+//                    if (selectionNumber == 3) {
+//                        accountService.showPlayerCurrentBalance(player.getLogin());
+//                    }
+//                    if (selectionNumber == 4) {
+//                        auditService.printAuditUserHistory(player.getLogin());
+//                    }
+//                    if (selectionNumber == 5) {
+//                        transactionService.showUserOperationHistory(player.getLogin());
+//                    }
                     if (selectionNumber == 6) {
                         authorizationService.logout();
                         System.out.println("Вы вышли из системы");

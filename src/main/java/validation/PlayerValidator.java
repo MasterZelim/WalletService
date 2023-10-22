@@ -8,7 +8,7 @@ public class PlayerValidator {
         }
     }
     public void validationPlayerPassword(String password) {
-        if (password.length() < 8) {
+        if (password.length() > 1) {
             throw new IllegalArgumentException("В пароле игрока должно быть >= 8 символов.");
         }
     }

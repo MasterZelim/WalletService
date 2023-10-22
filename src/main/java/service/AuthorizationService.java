@@ -2,11 +2,15 @@ package service;
 
 import model.Action;
 import model.Player;
+import repozitory.AuthorizationRepository;
 import validation.PlayerValidator;
+
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 public class AuthorizationService {
-    private final Map<String, Player> players = new HashMap<>();
+
+
     private final LoggerService loggerService = new LoggerService();
     private final AuditService auditService;
     private final PlayerValidator playerValidator;
@@ -14,11 +18,16 @@ public class AuthorizationService {
     public AuthorizationService(AuditService auditService, PlayerValidator PlayerValidator) {
         this.auditService = auditService;
         this.playerValidator = PlayerValidator;
+
     }
-    public Player logIn(String login, String password) {
+    public Player logIn(String login, String password) throws SQLException {
         playerValidator.validationPlayerName(login);
         playerValidator.validationPlayerPassword(password);
-        Player player = players.get(login);
+        Player player = null;
+
+            player = AuthorizationRepository.retrievePlayer(login);
+
+
         if (player == null) {
             throw new IllegalArgumentException("Игрок с таким логином не найден " + login);
         }
@@ -33,16 +42,22 @@ public class AuthorizationService {
     public Player registrationPlayer(String login, String password) { //проверка на null аргументов нужна.
         playerValidator.validationPlayerName(login);
         playerValidator.validationPlayerPassword(password);
+        Player player = null;
 
-        Player player = players.get(login);
-        if (player != null) {
-            throw new IllegalArgumentException("Игрок с таким именем пользователя уже существует. Пожалуйста, используйте другое имя пользователя.");
+        try {
+            AuthorizationRepository.createTable();
+
+            player = AuthorizationRepository.retrievePlayer(login);
+
+            if (player != null) {
+                throw new IllegalArgumentException("Игрок с таким именем пользователя уже существует. Пожалуйста, используйте другое имя пользователя.");
+            }
+            AuthorizationRepository.insertRecord(login,password);
+            player = AuthorizationRepository.retrievePlayer(login);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        player = Player.builder()
-                .login(login)
-                .password(password)
-                .build();
-        players.put(login, player);
+
 
         loggerService.info(Action.REGISTRATION);
         auditService.saveAuditUserHistory(login, Action.REGISTRATION);
