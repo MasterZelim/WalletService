@@ -1,9 +1,17 @@
 package model;
 
 public enum Action {
-    AUTHORIZATION,
-    FINISHING_JOB,
     DEBIT,
     CREDIT,
-    CREATE_ACCOUNT, ERROR, REGISTRATION, COMPLETION_WORK;
+    AUTHORIZATION,
+    LOGGED_OUT_ACCOUNT,
+    COMPLETION_WORK,
+    REGISTRATION,
+    LOGGED_IN,
+    ERROR,
+    CREATE_ACCOUNT;
+
+    Action(){
+
+    }
 }

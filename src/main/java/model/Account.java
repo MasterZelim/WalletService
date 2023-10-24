@@ -1,45 +1,27 @@
 package model;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@Data
+@EqualsAndHashCode
+@ToString
 public class Account {
-    private long id;
+    private Long id;
     private Player player;
-    private double balance;
+    private float balance;
 
-    public Account(long id, Player player, double balance) {
+    public Account(Long id, Player player, Float balance) {
         this.id = id;
         this.player = player;
         this.balance = balance;
     }
 
-    public Account(Player player, double balance) {
+    public Account(Player player, Float balance) {
         this.player = player;
         this.balance = balance;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
 }

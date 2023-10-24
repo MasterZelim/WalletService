@@ -11,6 +11,13 @@ public class AccountRepository {
     private static final String USER_NAME = "postgres";
     private static final String PASSWORD = "1";
 
+    private final String SELECT_BY_player_Id_LEFT_JOIN = "SELECT account.id, account.player_id, account.balance, " +
+            "player.name, player.password FROM account LEFT JOIN player ON player.id = player_id WHERE player_id = ?";
+
+    private final String SELECT_BY_PLAYER_NAME_LEFT_JOIN = "SELECT account.id, account.player_id, account.balance, " +
+            "player.name, player.password FROM account LEFT JOIN player ON player.id = player_id WHERE player.name = ?";
+    private final String INSERT_ACCOUNT = "INSERT INTO account(player_id,balance) VALUES(?,?)";
+    private final String UPDATE_BALANCE = "UPDATE account SET balance = ? WHERE id = ?";
     public static void insertRecord(Account account) throws SQLException {
 
         try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
@@ -41,8 +48,8 @@ public class AccountRepository {
                 double balance = resultSet.getDouble("balance");
 
                 Player player1 = AuthorizationRepository.retrievePlayer(player_id);
-                Account account = new Account(id,player1,balance);
-                accountList.add(account);
+//                Account account = new Account(id,player1,balance);
+//                accountList.add(account);
             }
 
         } catch (SQLException e) {
@@ -73,8 +80,8 @@ public class AccountRepository {
                 double balance = resultSet.getDouble("balance");
 
                 Player player1 = AuthorizationRepository.retrievePlayer(player_id);
-                Account account = new Account(id1,player1,balance);
-                accountList.add(account);
+               // Account account = new Account(id1,player1,balance);
+               // accountList.add(account);
             }
 
         } catch (SQLException e) {

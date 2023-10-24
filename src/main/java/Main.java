@@ -66,14 +66,14 @@ public class Main {
                     if (selectionNumber == 1) {
                         System.out.println("Введите сумму");
                         double amount = scanner.nextDouble();
-                        Transaction credit = new Transaction(amount, accountService.getAccount(player), CREDIT);
-                        transactionService.processTransaction(credit);
+                     //   Transaction credit = new Transaction(amount, accountService.getAccount(player), CREDIT);
+                      //  transactionService.processTransaction(credit);
                     }
                     if (selectionNumber == 2) {
                         System.out.println("Введите сумму");
                         double amount = scanner.nextDouble();
-                        Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
-                        transactionService.processTransaction(debit);
+                       // Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
+                      //  transactionService.processTransaction(debit);
                     }
 //                    if (selectionNumber == 3) {
 //                        accountService.showPlayerCurrentBalance(player.getLogin());

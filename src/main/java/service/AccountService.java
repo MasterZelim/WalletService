@@ -25,9 +25,9 @@ public class AccountService {
         account = AccountRepository.retrieveAccount(player);
 
         if (account == null) {
-            account = new Account(player, 0);
+            //account = new Account(player, 0);
             AccountRepository.insertRecord(account);
-            auditService.saveAuditUserHistory(account.getPlayer().getLogin(), Action.CREATE_ACCOUNT);
+           // auditService.saveAuditUserHistory(account.getPlayer().getLogin(), Action.CREATE_ACCOUNT);
             loggerService.info(Action.CREATE_ACCOUNT);
         }
         return account;
