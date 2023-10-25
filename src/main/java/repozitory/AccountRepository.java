@@ -1,10 +1,10 @@
 package repozitory;
 
+import config.ConnectionManager;
 import model.Account;
 import model.Player;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 public class AccountRepository {
     private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
@@ -18,96 +18,91 @@ public class AccountRepository {
             "player.name, player.password FROM account LEFT JOIN player ON player.id = player_id WHERE player.name = ?";
     private final String INSERT_ACCOUNT = "INSERT INTO account(player_id,balance) VALUES(?,?)";
     private final String UPDATE_BALANCE = "UPDATE account SET balance = ? WHERE id = ?";
-    public static void insertRecord(Account account) throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
 
-            String insertDataSQL = "INSERT INTO accounts (player_id, balance) VALUES (?, ?)";
-            PreparedStatement insertDataStatement = connection.prepareStatement(insertDataSQL);
-            insertDataStatement.setLong(1, account.getPlayer().getId());
-            insertDataStatement.setDouble(2, account.getBalance());
-            insertDataStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        public Optional<Account> get(long playerId){
+            try( Connection connection = ConnectionManager.open();
+                 PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_player_Id_LEFT_JOIN)) {
+                     preparedStatement.setLong(1,playerId);
+                     ResultSet resultSet = preparedStatement.executeQuery();
+                     if (resultSet.next()){
+                         Long accountId = resultSet.getLong("id");
+                         float balance = resultSet.getFloat("balance");
+                         String name = resultSet.getString("name");
+                         String password = resultSet.getString("password");
+                         return Optional.of(new Account(accountId,new Player(playerId,name,password), balance));
+                     }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return Optional.empty();
         }
 
+    public Optional<Account> get(String name){
+
+            try (Connection connection = ConnectionManager.open();
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_PLAYER_NAME_LEFT_JOIN)) {
+
+                preparedStatement.setString(1,name);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()){
+                    Long id = resultSet.getLong("id");
+                    Long playerId = resultSet.getLong("player_id");
+                    float balance = resultSet.getFloat("balance");
+                    String PlayerName = resultSet.getString("name");
+                    String password = resultSet.getString("password");
+                    return Optional.of(new Account(id,new Player(playerId,PlayerName,password), balance));
+
+                }
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+            return Optional.empty();
     }
-    public static Account retrieveAccount(Player player) throws SQLException {
 
-        List<Account> accountList = new ArrayList<>();
+    public boolean save(Account account){
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+            try(Connection connection = ConnectionManager.open();
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ACCOUNT)) {
 
-            String retrieveDataSQL = "SELECT * FROM accounts";
-            Statement retrieveDataStatement = connection.createStatement();
-            ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
+                preparedStatement.setLong(1,account.getPlayer().getId());
+                preparedStatement.setFloat(2,account.getBalance());
+                return preparedStatement.executeUpdate()>0;
 
-            while (resultSet.next()){
-                long id = resultSet.getInt("id");
-                int player_id = resultSet.getInt("player_id");
-                double balance = resultSet.getDouble("balance");
-
-                Player player1 = AuthorizationRepository.retrievePlayer(player_id);
-//                Account account = new Account(id,player1,balance);
-//                accountList.add(account);
+            }catch (SQLException e){
+                throw new RuntimeException();
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        for (Account account : accountList) {
-
-            if (account.getPlayer().equals(player)){
-                return account;
-            }
-        }
-        return null;
     }
-    public static Account retrieveAccount(long id) throws SQLException {
 
-        List<Account> accountList = new ArrayList<>();
+    public float getCurrentBalance(Long id){
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+            try(Connection connection = ConnectionManager.open();
+            PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_player_Id_LEFT_JOIN)) {
+                preparedStatement.setLong(1,id);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()){
+                    return resultSet.getFloat("balance");
 
-            String retrieveDataSQL = "SELECT * FROM accounts";
-            Statement retrieveDataStatement = connection.createStatement();
-            ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
+                }
 
-            while (resultSet.next()){
-                long id1 = resultSet.getInt("id");
-                int player_id = resultSet.getInt("player_id");
-                double balance = resultSet.getDouble("balance");
-
-                Player player1 = AuthorizationRepository.retrievePlayer(player_id);
-               // Account account = new Account(id1,player1,balance);
-               // accountList.add(account);
+            }catch (SQLException e){
+                throw new RuntimeException(e);
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        for (Account account : accountList) {
-
-            if (account.getId()==id){
-                return account;
-            }
-        }
-        return null;
+            return 0;
     }
-    public static void createTable() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+    public boolean saveCurrentBalance(Account account){
 
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (" +
-                    "id SERIAL PRIMARY KEY," +
-                    "player_id INT REFERENCES players(id)," +
-                    "balance NUMERIC)";
-            Statement createTableStatement = connection.createStatement();
-            createTableStatement.execute(createTableSQL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            try (Connection connection = ConnectionManager.open();
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_BALANCE)){
+                preparedStatement.setFloat(1,account.getBalance());
+                preparedStatement.setFloat(2,account.getId());
+                return preparedStatement.executeUpdate()>0;
+
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
     }
 }
