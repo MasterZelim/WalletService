@@ -61,7 +61,7 @@ public class PlayerRepository {
             if (resultSet.next()) {
                 Long id = resultSet.getLong("id");
                 String password = resultSet.getString("password");
-                return Optional.of(new Player((id, name, password)));
+                return Optional.of(new Player(id, name, password));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
