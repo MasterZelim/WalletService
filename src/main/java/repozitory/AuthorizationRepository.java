@@ -46,8 +46,8 @@ public class AuthorizationRepository {
                 String loginPlayer = resultSet.getString("login");
                 String password = resultSet.getString("password");
 
-                Player player = new Player(player_id,loginPlayer,password);
-                playerList.add(player);
+//                Player player = new Player(player_id,loginPlayer,password);
+//                playerList.add(player);
             }
 
         } catch (SQLException e) {
@@ -77,8 +77,8 @@ public class AuthorizationRepository {
                 String loginPlayer = resultSet.getString("login");
                 String password = resultSet.getString("password");
 
-                Player player = new Player(player_id,loginPlayer,password);
-                playerList.add(player);
+//                Player player = new Player(player_id,loginPlayer,password);
+//                playerList.add(player);
             }
 
         } catch (SQLException e) {
@@ -87,9 +87,9 @@ public class AuthorizationRepository {
 
         for (Player player : playerList) {
 
-            if (player.getLogin().equals(login)){
-                return player;
-            }
+//            if (player.getLogin().equals(login)){
+//                return player;
+//            }
         }
         return null;
     }

@@ -20,7 +20,7 @@ public class AccountRepository {
     private final String UPDATE_BALANCE = "UPDATE account SET balance = ? WHERE id = ?";
 
 
-        public Optional<Account> get(long playerId){
+        public Optional<Account> getAccountById(long playerId){
             try( Connection connection = ConnectionManager.open();
                  PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_player_Id_LEFT_JOIN)) {
                      preparedStatement.setLong(1,playerId);
@@ -39,7 +39,7 @@ public class AccountRepository {
             return Optional.empty();
         }
 
-    public Optional<Account> get(String name){
+    public Optional<Account> getAccountByName(String name){
 
             try (Connection connection = ConnectionManager.open();
             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_PLAYER_NAME_LEFT_JOIN)) {
