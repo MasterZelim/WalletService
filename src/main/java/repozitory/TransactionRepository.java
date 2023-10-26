@@ -1,118 +1,96 @@
 package repozitory;
 
+import config.ConnectionManager;
 import model.Account;
 import model.Player;
 import model.Transaction;
 import model.TransactionType;
 
+import java.net.CookieHandler;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TransactionRepository {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
-    private static final String USER_NAME = "postgres";
-    private static final String PASSWORD = "1";
+    private final String SELECT_ID_TRANSACTION = "SELECT id FROM transaction";
+    private final String SELECT_BY_ID = "SELECT * FROM player WHERE id = ?";
+    private final String INSERT = "INSERT INTO transaction (transaction_type, account_id, amount, date) " +
+                                   "VALUES(?,?,?,?)";
+    private final String SELECT_LEFT_JOIN = "SELECT transaction.id,transaction_type, account_id,player_id,player_id,amount, date " +
+                                            "FROM transaction LEFT JOIN account.id = account_id WHERE account_id = ?";
 
-    public static void insertRecord(Transaction transaction) throws SQLException {
+    public boolean save(Transaction transaction){
+        try(Connection connection = ConnectionManager.open();
+        PreparedStatement preparedStatement = connection.prepareStatement(INSERT)){
+            preparedStatement.setString(1,transaction.getTypeTransaction().name());
+            preparedStatement.setLong(2,transaction.getAccount().getId());
+            preparedStatement.setFloat(3,transaction.getAmount());
+            preparedStatement.setTimestamp(4,transaction.getTimestamp());
+            return preparedStatement.execute();
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
-
-            String insertDataSQL = "INSERT INTO transactions (uuid, amount,account_id,transactionType) VALUES (?,?,?,?)";
-            PreparedStatement insertDataStatement = connection.prepareStatement(insertDataSQL);
-            insertDataStatement.setString(1, String.valueOf(transaction.getUuid()));
-            insertDataStatement.setDouble(2, transaction.getAmount());
-            insertDataStatement.setLong(3, transaction.getAccount().getId());
-            insertDataStatement.setString(4, String.valueOf(transaction.getTransactionType()));
-            insertDataStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException e){
+            throw  new RuntimeException(e);
         }
-
     }
-    public static List<Transaction> retrieveTransaction(Account account) throws SQLException {
 
-        List<Transaction> transactionList = new ArrayList<>();
+    public Optional<List<Transaction>> get(Long accountId, Long playerId){
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
-
-            String retrieveDataSQL = "SELECT * FROM transactions";
-            Statement retrieveDataStatement = connection.createStatement();
-            ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
-
+        List<Transaction> transactionHistory = new ArrayList<>();
+        Player player = getPlayerById(playerId).get();
+        try(Connection connection = ConnectionManager.open();
+        PreparedStatement preparedStatement = connection.prepareStatement(SELECT_LEFT_JOIN)){
+            preparedStatement.setLong(1,accountId);
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
-                long id = resultSet.getInt("id");
-                UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                double amount = resultSet.getDouble("amount");
-                long account_id = resultSet.getLong("account_id");
-                TransactionType transactionType = TransactionType.valueOf(resultSet.getString("transactionType"));
-
-                Account account1 = AccountRepository.retrieveAccount(account_id);
-                Transaction transaction = new Transaction(id,uuid,amount,account1,transactionType);
-
-                if (transaction.getAccount().equals(account)){
-                    transactionList.add(transaction);
-                }
-
+                Long transactionId = resultSet.getLong("id");
+                Long Id = resultSet.getLong("account_id");
+                TransactionType  transactionType = TransactionType.valueOf(resultSet.getString("transaction_type"));
+                float amount = resultSet.getFloat("amount");
+                Timestamp timestamp = resultSet.getTimestamp("amount");
+                Transaction transaction = new Transaction(transactionId,transactionType,new Account(Id,player,amount),amount,timestamp);
+                transactionHistory.add(transaction);
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
         }
 
-        return transactionList;
+        return Optional.of(transactionHistory);
     }
 
-    public static boolean retrieveBoolean(Transaction transaction) throws SQLException {
+    public Optional<Set<Long>> getTransactionUuid(){
 
-        List<Transaction> transactionList = new ArrayList<>();
+        Set<Long> idCompletedTransactions = new HashSet<>();
+        try(Connection connection = ConnectionManager.open();
+        Statement statement = connection.createStatement()) {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
-
-            String retrieveDataSQL = "SELECT * FROM transactions";
-            Statement retrieveDataStatement = connection.createStatement();
-            ResultSet  resultSet = retrieveDataStatement.executeQuery(retrieveDataSQL);
-
+            ResultSet resultSet = statement.executeQuery(SELECT_ID_TRANSACTION);
             while (resultSet.next()){
-                long id = resultSet.getInt("id");
-                UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                double amount = resultSet.getDouble("amount");
-                long account_id = resultSet.getLong("account_id");
-                TransactionType transactionType = TransactionType.valueOf(resultSet.getString("transactionType"));
-
-                Account account1 = AccountRepository.retrieveAccount(account_id);
-                Transaction transaction1 = new Transaction(id,uuid,amount,account1,transactionType);
-                transactionList.add(transaction);
+                idCompletedTransactions.add(resultSet.getLong("id"));
             }
+            return Optional.of(idCompletedTransactions);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
         }
-
-        for (Transaction transaction2 : transactionList) {
-
-            if (transaction2.getUuid().equals(transaction.getUuid())){
-                return true;
-            }
-        }
-        return false;
     }
-    public static void createTable() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD)) {
+    private Optional<Player> getPlayerById(Long id){
+        try(Connection connection = ConnectionManager.open();
+        PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
 
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS transactions (" +
-                    "id SERIAL PRIMARY KEY," +
-                    "uuid VARCHAR(255)," +
-                    "amount NUMERIC,"+
-                    "account_id INT REFERENCES accounts(id),"+
-                    "transactionType VARCHAR(6))";
-            Statement createTableStatement = connection.createStatement();
-            createTableStatement.execute(createTableSQL);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            preparedStatement.setLong(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+
+                String name = resultSet.getString("name");
+                String password = resultSet.getString("password");
+                Player player = new Player(id,name,password);
+                return Optional.of(player);
+            }
+
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return Optional.empty();
     }
 }
