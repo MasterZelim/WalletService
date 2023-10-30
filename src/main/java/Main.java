@@ -1,9 +1,16 @@
-import model.Player;
-import model.Transaction;
+import config.ConnectionManager;
+import config.ConnectionManagerLiquibase;
+import model.*;
+import repozitory.*;
 import service.*;
+import validation.AccountValidator;
+import validation.AccountValidatorImpl;
 import validation.PlayerValidator;
+import validation.PlayerValidatorImpl;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 import static model.TransactionType.CREDIT;
@@ -14,86 +21,120 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
 
-        AuditService auditService = new AuditService();
-        TransactionService transactionService = new TransactionService(auditService);
-        PlayerValidator playerValidator = new PlayerValidator();
-        AuthorizationService authorizationService = new AuthorizationService(auditService, playerValidator);
-        LoggerService loggerService = new LoggerService();
-        AccountService accountService = new AccountService(auditService, loggerService);
-        Scanner scanner = new Scanner(System.in);
+        String CREATE_SCHEMA_WALLET = "CREATE SCHEMA IF NOT EXISTS wallet";
+        String CREATE_SCHEMA_MIGRATION = "CREATE SCHEMA IF NOT EXISTS migration";
+        String path = "db/db/changelog.xml";
+        try (Connection connection = ConnectionManager.open();
+             var database = ConnectionManagerLiquibase.getConnection(connection)) {
+            Statement statement = connection.createStatement();
+            statement.addBatch(CREATE_SCHEMA_WALLET);
+            statement.addBatch(CREATE_SCHEMA_MIGRATION);
+            statement.executeBatch();
+            ConnectionManagerLiquibase.executeLiquibase(path, database);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        String login;
+
+        AccountRepository accountRepository = new AccountRepositoryImpl();
+        AuditRepository auditRepository = new AuditRepositoryImpl();
+        PlayerRepository playerRepository = new PlayerRepositoryImpl();
+        TransactionRepository transactionRepository = new TransactionRepositoryImpl();
+
+        PlayerValidator playerValidator = new PlayerValidatorImpl();
+        AccountValidator accountValidator = new AccountValidatorImpl();
+
+        AuditService auditService = new AuditServiceImpl(auditRepository);
+        LoggerService loggerService = new LoggerServiceImpl();
+        AuthorizationService authorizationService = new AuthorizationServiceImpl(auditService, playerValidator, loggerService, playerRepository);
+        AccountService accountService = new AccountServiceImpl(loggerService, auditService, accountRepository);
+
+        TransactionService transactionService = new TransactionServiceImpl(auditService, loggerService, accountValidator, accountService, transactionRepository);
+
+
+        Scanner in = new Scanner(System.in);
+
+        String name;
         String password;
         boolean flag = true;
-        boolean isLogout = true;
-        int selectionNumber;
+        boolean isLogout = false;
+
 
         while (flag) {
 
-            System.out.println("Выберите действие:");
-            System.out.println("1-зарегистрироваться");
-            System.out.println("2-авторизоваться");
-            System.out.println("3-выход");
-            selectionNumber = scanner.nextInt();
-            if (selectionNumber == 1) {
+            System.out.println("""
+                    Выберите действие:
+                    1-зарегистрироваться
+                    2-авторизоваться
+                    3-выход""");
+
+
+            int actionNumber=in.nextInt();
+
+            if (actionNumber == 1) {
                 System.out.println("Введите логин:");
-                login = scanner.next();
+                name = in.next();
                 System.out.println("Введите пароль:");
-                password = scanner.next();
-                Player player = authorizationService.registrationPlayer(login, password);
+                password = in.next();
+                Player player = authorizationService.playerRegister(name, password);
                 accountService.getAccount(player);
             }
 
-            if (selectionNumber == 2) {
+            if (actionNumber == 2) {
                 System.out.println("Введите логин:");
-                login = scanner.next();
+                name = in.next();
                 System.out.println("Введите пароль:");
-                password = scanner.next();
-                Player player = authorizationService.logIn(login, password);
-                System.out.println("Игрок авторизован");
+                password = in.next();
+                Player player = authorizationService.logIn(name, password);
+                Account account = accountService.getAccount(player);
+                System.out.println("Игрок авторизован" + player.getName());
 
-                while (isLogout) {
+                while (!isLogout) {
 
-                    System.out.println("Выберите действие:");
-                    System.out.println("1. Пополнение счета");
-                    System.out.println("2. Снятие со счета");
-                    System.out.println("3. Текущий баланс");
-                    System.out.println("4. Показать аудит действий");
-                    System.out.println("5. Показать историю операций");
-                    System.out.println("6. Выход");
-                    selectionNumber = scanner.nextInt();
+                    System.out.println("""
+                    Выберите действие:
+                    1. Пополнение счета
+                    2. Снятие со счета
+                    3. Текущий баланс
+                    4. Показать аудит действий
+                    5. Показать историю операций
+                    6. Выход""");
 
-                    if (selectionNumber == 1) {
+                    actionNumber = in.nextInt();
+
+                    if (actionNumber == 1) {
                         System.out.println("Введите сумму");
-                        double amount = scanner.nextDouble();
-                     //   Transaction credit = new Transaction(amount, accountService.getAccount(player), CREDIT);
-                      //  transactionService.processTransaction(credit);
+                        float amount = in.nextFloat();
+                          Transaction credit = new Transaction(CREDIT, accountService.getAccount(player), amount);
+                          transactionService.processTransaction(credit);
                     }
-                    if (selectionNumber == 2) {
+                    if (actionNumber == 2) {
                         System.out.println("Введите сумму");
-                        double amount = scanner.nextDouble();
-                       // Transaction debit = new Transaction(amount, accountService.getAccount(player), DEBIT);
-                      //  transactionService.processTransaction(debit);
+                        float amount = in.nextFloat();
+                         Transaction debit = new Transaction(DEBIT, accountService.getAccount(player), amount);
+                         transactionService.processTransaction(debit);
                     }
-//                    if (selectionNumber == 3) {
-//                        accountService.showPlayerCurrentBalance(player.getLogin());
-//                    }
-//                    if (selectionNumber == 4) {
-//                        auditService.printAuditUserHistory(player.getLogin());
-//                    }
-//                    if (selectionNumber == 5) {
-//                        transactionService.showUserOperationHistory(player.getLogin());
-//                    }
-                    if (selectionNumber == 6) {
-                        authorizationService.logout();
+                    if (actionNumber == 3) {
+                        accountService.showPlayerCurrentBalance(player);
+                    }
+                    if (actionNumber == 4) {
+                        auditService.printAuditUserHistory(player);
+                    }
+                    if (actionNumber == 5) {
+                        transactionService.showUserTransactionHistory(account);
+                    }
+                    if (actionNumber == 6) {
+                        authorizationService.logout(player);
+                        isLogout = true;
                         System.out.println("Вы вышли из системы");
-                        isLogout = false;
                     }
                 }
             }
-            if (selectionNumber == 3) {
+            if (actionNumber == 3) {
+                loggerService.info(Action.COMPLETION_WORK);
                 flag = false;
             }
         }
     }
 }
+

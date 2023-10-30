@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
 public class ConnectionManager {
 
     private final static String USERNAME_KEY = "postgres";
@@ -16,11 +15,8 @@ public class ConnectionManager {
     {
         loadDriver();
     }
-
     private ConnectionManager(){
-
     }
-
     public static Connection open(){
 
         try {
@@ -34,19 +30,6 @@ public class ConnectionManager {
         }
 
     }
-
-    public static void connectionClose(){
-
-        try {
-            if (CONNECTION!=null&&!CONNECTION.isClosed()){
-                CONNECTION.isClosed();
-
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
-
     private static void loadDriver(){
 
         try {
