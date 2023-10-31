@@ -22,10 +22,9 @@ public class LoadJDBCSettingsFromPropertiesFile {
         return PROPERTIES.getProperty(key);
 
     }
-    private static void loadProperties(){
-
-        try (var inputStream=LoadJDBCSettingsFromPropertiesFile.class.getClassLoader()
-                .getResourceAsStream("JDBCSetting.properties")){
+    private static void loadProperties() {
+        try(var inputStream = LoadJDBCSettingsFromPropertiesFile.class.getClassLoader()
+                .getResourceAsStream("JDBCSetting.properties")) {
 
             PROPERTIES.load(inputStream);
         } catch (IOException e) {

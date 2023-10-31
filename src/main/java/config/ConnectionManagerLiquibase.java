@@ -18,7 +18,10 @@ public final class ConnectionManagerLiquibase {
 
     public static Database getConnection(Connection connection) throws DatabaseException {
 
-        return DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+        Database database =  DatabaseFactory.getInstance().
+                findCorrectDatabaseImplementation(new JdbcConnection(connection));
+        database.setLiquibaseSchemaName("migration");
+        return database;
 
 
     }

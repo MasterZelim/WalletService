@@ -23,7 +23,7 @@ public class Main {
 
         String CREATE_SCHEMA_WALLET = "CREATE SCHEMA IF NOT EXISTS wallet";
         String CREATE_SCHEMA_MIGRATION = "CREATE SCHEMA IF NOT EXISTS migration";
-        String path = "db/db/changelog.xml";
+        String path = "db/changelog/changelog.xml";
         try (Connection connection = ConnectionManager.open();
              var database = ConnectionManagerLiquibase.getConnection(connection)) {
             Statement statement = connection.createStatement();
