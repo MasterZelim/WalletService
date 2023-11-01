@@ -7,7 +7,7 @@
     <changeSet id="001-create-table-account" author="das">
         <createTable tableName="account" schemaName="wallet">
             <column name="id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false";
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="player_id" type="bigint">
                 <constraints nullable="false" foreignKeyName="account_player_fk" references="player(id)"/>

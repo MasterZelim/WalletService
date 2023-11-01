@@ -1,0 +1,7 @@
+CREATE TABLE public.account(
+    id bigserial NOT NULL,
+    player_id bigserial NOT NULL,
+    balance float4 NOT NULL,
+    CONSTRAINT account_pk PRIMARY KEY (id),
+    CONSTRAINT account_fk FOREIGN KEY (player_id) REFERENCES public.player(id) ON DELETE CASCADE ON UPDATE CASCADE
+    );

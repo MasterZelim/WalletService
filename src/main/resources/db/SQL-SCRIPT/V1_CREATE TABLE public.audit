@@ -1,0 +1,8 @@
+CREATE TABLE public.audit (
+    id bigserial NOT NULL,
+    player_id bigserial NOT NULL,
+    "action" varchar NOT NULL,
+    "date" timestamp NOT NULL,
+    CONSTRAINT audit_pk PRIMARY KEY (id),
+    CONSTRAINT audit_fk FOREIGN KEY (player_id) REFERENCES public.player(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

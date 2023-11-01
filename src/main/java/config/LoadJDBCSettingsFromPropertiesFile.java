@@ -3,24 +3,22 @@ package config;
 import java.io.IOException;
 import java.util.Properties;
 
-public class LoadJDBCSettingsFromPropertiesFile {
 
-    private final static Properties PROPERTIES = new Properties();
+public final class LoadJDBCSettingsFromPropertiesFile {
+
+    private static final Properties PROPERTIES = new Properties();
 
 
     static {
         loadProperties();
     }
 
-    private LoadJDBCSettingsFromPropertiesFile(){
-
+    private LoadJDBCSettingsFromPropertiesFile() {
 
     }
 
-    public static String get(String key){
-
+    public static String get(String key) {
         return PROPERTIES.getProperty(key);
-
     }
     private static void loadProperties() {
         try(var inputStream = LoadJDBCSettingsFromPropertiesFile.class.getClassLoader()
@@ -32,3 +30,4 @@ public class LoadJDBCSettingsFromPropertiesFile {
         }
     }
 }
+
