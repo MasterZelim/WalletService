@@ -48,9 +48,9 @@ public class AuthorizationServiceImpl implements AuthorizationService{
 
         playerValidator.validationPlayerName(name);
         playerValidator.validationPlayerPassword(password);
-        if (playerRepository.getByName(name).isEmpty()){
-            throw  new IllegalArgumentException("Player with this username already exists. " +
-                    "Please use other username.");
+        if (playerRepository.getByName(name).isPresent()){
+            throw  new IllegalArgumentException("Игрок с таким именем пользователя уже существует. " +
+                    "Пожалуйста, используйте другое имя пользователя");
         }
         Player newPlayer=new Player(name,password);
         newPlayer = playerRepository.save(newPlayer).get();
