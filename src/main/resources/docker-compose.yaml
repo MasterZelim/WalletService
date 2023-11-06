@@ -3,8 +3,8 @@ services:
   wallet_postgres:
     image: postgres:13.3
     environment:
-      POSTGRES_DB: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "1"
+      POSTGRES_DB: "postgresDB"
+      POSTGRES_USER: "postgresDB"
+      POSTGRES_PASSWORD: "2"
     ports:
       - "5432:5432"
