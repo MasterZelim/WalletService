@@ -15,8 +15,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private final String SELECT_BY_ID = "SELECT * FROM player WHERE id = ?";
     private final String INSERT = "INSERT INTO transaction (transaction_type, account_id, amount, date) " +
                                    "VALUES(?,?,?,?)";
-    private final String SELECT_LEFT_JOIN = "SELECT transaction.id,transaction_type, account_id,player_id,player_id,amount, date " +
-                                            "FROM transaction LEFT JOIN account.id = account_id WHERE account_id = ?";
+    private final String SELECT_LEFT_JOIN = "SELECT transaction.id,transaction_type, account_id,amount,date " +
+                                            "FROM transaction LEFT JOIN account ON account.id = account_id WHERE account_id = ?";
 
     public boolean save(Transaction transaction){
         try(Connection connection = ConnectionManager.open();
@@ -46,7 +46,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 Long Id = resultSet.getLong("account_id");
                 TransactionType  transactionType = TransactionType.valueOf(resultSet.getString("transaction_type"));
                 float amount = resultSet.getFloat("amount");
-                Timestamp timestamp = resultSet.getTimestamp("amount");
+                Timestamp timestamp = resultSet.getTimestamp("date");
                 Transaction transaction = new Transaction(transactionId,transactionType,new Account(Id,player,amount),amount,timestamp);
                 transactionHistory.add(transaction);
             }

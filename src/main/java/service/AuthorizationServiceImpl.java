@@ -5,7 +5,6 @@ import model.Audit;
 import model.Player;
 import repozitory.PlayerRepository;
 import validation.PlayerValidator;
-import validation.PlayerValidatorImpl;
 
 public class AuthorizationServiceImpl implements AuthorizationService{
 
@@ -15,7 +14,8 @@ public class AuthorizationServiceImpl implements AuthorizationService{
     private final PlayerRepository playerRepository;
     private boolean login;
 
-    public AuthorizationServiceImpl(AuditService auditService, PlayerValidator playerValidator, LoggerService loggerService, PlayerRepository playerRepository) {
+    public AuthorizationServiceImpl(AuditService auditService, PlayerValidator playerValidator,
+                                    LoggerService loggerService, PlayerRepository playerRepository) {
         this.auditService = auditService;
         this.playerValidator = playerValidator;
         this.loggerService = loggerService;
@@ -28,12 +28,12 @@ public class AuthorizationServiceImpl implements AuthorizationService{
         playerValidator.validationPlayerPassword(password);
 
         Player player = playerRepository.getByName(name).orElseThrow(
-                () -> new IllegalArgumentException("Player with this login not found " + name)
+                () -> new IllegalArgumentException("Игрок с таким логином не найден " + name)
         );
 
         if (!player.getPassword().equals(password)){
 
-            throw new IllegalArgumentException("Wrong password " + name);
+            throw new IllegalArgumentException("Неправильный пароль " + name);
         }
 
         loggerService.info(Action.LOGGED_IN);
@@ -63,7 +63,7 @@ public class AuthorizationServiceImpl implements AuthorizationService{
     @Override
     public boolean logout(Player player){
         login = false;
-        System.out.println("You are log out");
+        System.out.println("Вы вышли из системы");
         auditService.saveAuditUserHistory(new Audit(player.getId(), Action.LOGGED_OUT_ACCOUNT));
         return login;
     }

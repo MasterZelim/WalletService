@@ -49,6 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
                 accountService.updateBalance(transaction.getAccount());
                 saveUserTransaction(transaction);
                 auditService.saveAuditUserHistory(new Audit(player.getId(),Action.DEBIT));
+                loggerService.info(Action.DEBIT);
             }
 
             else {

@@ -1,7 +1,14 @@
 package model;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.sql.Timestamp;
 
+@Data
+@Builder
+@EqualsAndHashCode
 public class Audit {
 
     private Long id;
@@ -25,4 +32,6 @@ public class Audit {
         this.action = action;
         this.timestamp = timestamp;
     }
+
+
 }

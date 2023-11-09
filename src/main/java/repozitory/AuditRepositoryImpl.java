@@ -12,15 +12,15 @@ import java.util.Optional;
 public class AuditRepositoryImpl implements AuditRepository{
 
     private final String INSERT = "INSERT INTO audit (player_id, action, date) VALUES(?,?,?)";
-    private final String SELECT_By_Player_Id_Action_LEFT_JOIN = "SELECT audit.id, action, date FROM audit " +
-            "LEFT JOIN player ON player_id WHERE player_id = ?";
+    private final String SELECT_By_Player_Id_Action_LEFT_JOIN = "SELECT audit.id, player_id, action, date FROM audit " +
+            "LEFT JOIN player ON player.id=player_id WHERE player_id = ?";
 
     public boolean save(Audit audit){
         try(Connection connection = ConnectionManager.open();
         PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
-//            preparedStatement.setLong(1, audit.getPlayerID());
-//            preparedStatement.setString(2, audit.getAction().name());
-//            preparedStatement.setTimestamp(3, audit.getTimestamp());
+            preparedStatement.setLong(1, audit.getPlayerID());
+            preparedStatement.setString(2, audit.getAction().name());
+            preparedStatement.setTimestamp(3, audit.getTimestamp());
             return preparedStatement.executeUpdate() > 0;
         }catch (SQLException e) {
             throw new RuntimeException(e);
@@ -40,7 +40,7 @@ public class AuditRepositoryImpl implements AuditRepository{
                 Long auditId = resultSet.getLong("id");
                 Action action = Action.valueOf(resultSet.getString("action"));
                 Timestamp timestamp = resultSet.getTimestamp("Date");
-//                actions.add((new Audit(auditId,playerId,action,timestamp));
+                actions.add((new Audit(auditId,playerId,action,timestamp)));
 
             }
             return  Optional.of(actions);

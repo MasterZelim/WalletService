@@ -21,7 +21,7 @@ public class AuditServiceImpl implements AuditService {
     public void printAuditUserHistory(Player player) {
         var actions = auditRepository.getById(player.getId());
         if (actions.isEmpty()){
-            System.out.println("Action history for name: " + player.getName()+ " not found");
+            System.out.println("История действий для имени: " + player.getName()+ " не найдено");
             return;
         }
         actions.get().forEach(System.out::println);
