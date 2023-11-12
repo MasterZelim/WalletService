@@ -40,7 +40,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void showPlayerCurrentBalance(Player player) {
 
-        System.out.println("Player current balance: " + accountRepository.getCurrentBalance(player.getId()));
+        System.out.println("Текущий баланс игрока: " + accountRepository.getCurrentBalance(player.getId()));
 
     }
 

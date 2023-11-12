@@ -87,7 +87,7 @@ public class Main {
                 password = in.next();
                 Player player = authorizationService.logIn(name, password);
                 Account account = accountService.getAccount(player);
-                System.out.println("Игрок авторизован" + player.getName());
+                System.out.println("Игрок авторизован " + player.getName());
 
                 while (!isLogout) {
 
